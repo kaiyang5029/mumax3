@@ -1,0 +1,35 @@
+//mumax 3.10 [linux_amd64 go1.14(gc) CUDA-11.0]
+//GPU info: NVIDIA GeForce RTX 2080 Ti(11018MB), CUDA Driver 11.4, cc=7.5, using cc=75 PTX
+//(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium
+//This is free software without any warranty. See license.txt
+//********************************************************************//
+//  If you use mumax in any work or publication,                      //
+//  we kindly ask you to cite the references in references.bib        //
+//********************************************************************//
+//output directory: Homework03.out/
+Aex = 12e-12
+Msat = 1e6
+Ku1 = 0.6e6
+AnisU = vector(0, 0, 1)
+Dbulk = 0
+Dind = 2e-3
+alpha = 0.05
+xi = 0.2
+SetGridsize(1024, 64, 1)
+SetCellsize(4e-9, 4e-9, 1e-9)
+B_ext = vector(0, 0, 0)
+Temp = 0.0
+defregion(1, Cylinder(100e-9, inf).transl(-1500e-9, 0, 0))
+Ku1.setregion(1, 0.4e6)
+SetSolver(5)
+m = Uniform(0, 0, 1)
+B_ext = vector(0, 0, 0.18)
+j = vector(-2e12, 0, 0)
+AutoSnapshot(m, 0.5e-9)
+Run(30e-9)
+//********************************************************************//
+//Please cite the following references, relevant for your simulation. //
+//See bibtex file in output folder for justification.                 //
+//********************************************************************//
+//   * Mulkers et al., Phys. Rev. B 95, 144401 (2017).
+//   * Vansteenkiste et al., AIP Adv. 4, 107133 (2014).

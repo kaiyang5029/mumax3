@@ -1,0 +1,673 @@
+//mumax 3.10 [linux_amd64 go1.14(gc) CUDA-11.0]
+//GPU info: NVIDIA GeForce RTX 2080 Ti(11018MB), CUDA Driver 11.4, cc=7.5, using cc=75 PTX
+//(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium
+//This is free software without any warranty. See license.txt
+//********************************************************************//
+//  If you use mumax in any work or publication,                      //
+//  we kindly ask you to cite the references in references.bib        //
+//********************************************************************//
+//output directory: Example07.out/
+Aex = 12e-12
+Msat = 1e6
+Ku1 = 0.6e6
+AnisU = vector(0, 0, 1)
+Dbulk = 0
+Dind = 2e-3
+alpha = 0.10000
+SetGridsize(256, 256, 1)
+SetCellsize(4e-9, 4e-9, 1e-9)
+B_ext = vector(0, 0, 0)
+Temp = 750.0
+SetSolver(5)
+TableAdd(B_ext)
+TableAdd(E_Total)
+TableAdd(E_anis)
+TableAdd(E_demag)
+TableAdd(E_exch)
+TableAdd(E_Zeeman)
+TableAdd(ext_topologicalcharge)
+TableAdd(Temp)
+TableAdd(LastErr)
+OutputFormat = OVF1_TEXT
+m = Uniform(0, 0, 1)
+B_start := 0.25
+B_end := -0.35
+B_sweep_rate := -1e6
+B_step_size := -0.002
+B_total_steps := Ceil((B_end-B_start)/B_step_size) + 1
+B_current := 0.0
+B_current_mT := 0.0
+t0 := 0.0
+sim_run_time_per_step := B_step_size / B_sweep_rate
+const_field_run_time := 1e-9
+tableautosave_time := 1e-5 / Abs(B_sweep_rate)
+tableautosave(tableautosave_time)
+prt_str := sprintf("==> B_total_steps: %f", B_total_steps)
+print(prt_str)
+//==> B_total_steps: 301.000000
+prt_str = sprintf("==> sim_run_time_per_step: %e", sim_run_time_per_step)
+print(prt_str)
+//==> sim_run_time_per_step: 2.000000e-09
+for ind := 0; ind < B_total_steps; ind++ {
+	B_current = B_start + B_step_size*ind
+	B_ext = vector(0, 0, B_current)
+	prt_str = sprintf("==> B_current: %f. Running const_field_run_time", B_current)
+	print(prt_str)
+	Run(const_field_run_time)
+	B_current_mT = B_current * 1e3
+	saveas(m, sprintf("%04d_full_mag_%.0fmT", ind, B_current_mT))
+	t0 = t
+	B_ext = vector(0, 0, B_current+B_sweep_rate*(t-t0))
+	prt_str = sprintf("==> B_current: %f. Sweeping to next field value", B_current)
+	print(prt_str)
+	Run(sim_run_time_per_step)
+}
+//==> B_current: 0.250000. Running const_field_run_time
+//==> B_current: 0.250000. Sweeping to next field value
+//==> B_current: 0.248000. Running const_field_run_time
+//==> B_current: 0.248000. Sweeping to next field value
+//==> B_current: 0.246000. Running const_field_run_time
+//==> B_current: 0.246000. Sweeping to next field value
+//==> B_current: 0.244000. Running const_field_run_time
+//==> B_current: 0.244000. Sweeping to next field value
+//==> B_current: 0.242000. Running const_field_run_time
+//==> B_current: 0.242000. Sweeping to next field value
+//==> B_current: 0.240000. Running const_field_run_time
+//==> B_current: 0.240000. Sweeping to next field value
+//==> B_current: 0.238000. Running const_field_run_time
+//==> B_current: 0.238000. Sweeping to next field value
+//==> B_current: 0.236000. Running const_field_run_time
+//==> B_current: 0.236000. Sweeping to next field value
+//==> B_current: 0.234000. Running const_field_run_time
+//==> B_current: 0.234000. Sweeping to next field value
+//==> B_current: 0.232000. Running const_field_run_time
+//==> B_current: 0.232000. Sweeping to next field value
+//==> B_current: 0.230000. Running const_field_run_time
+//==> B_current: 0.230000. Sweeping to next field value
+//==> B_current: 0.228000. Running const_field_run_time
+//==> B_current: 0.228000. Sweeping to next field value
+//==> B_current: 0.226000. Running const_field_run_time
+//==> B_current: 0.226000. Sweeping to next field value
+//==> B_current: 0.224000. Running const_field_run_time
+//==> B_current: 0.224000. Sweeping to next field value
+//==> B_current: 0.222000. Running const_field_run_time
+//==> B_current: 0.222000. Sweeping to next field value
+//==> B_current: 0.220000. Running const_field_run_time
+//==> B_current: 0.220000. Sweeping to next field value
+//==> B_current: 0.218000. Running const_field_run_time
+//==> B_current: 0.218000. Sweeping to next field value
+//==> B_current: 0.216000. Running const_field_run_time
+//==> B_current: 0.216000. Sweeping to next field value
+//==> B_current: 0.214000. Running const_field_run_time
+//==> B_current: 0.214000. Sweeping to next field value
+//==> B_current: 0.212000. Running const_field_run_time
+//==> B_current: 0.212000. Sweeping to next field value
+//==> B_current: 0.210000. Running const_field_run_time
+//==> B_current: 0.210000. Sweeping to next field value
+//==> B_current: 0.208000. Running const_field_run_time
+//==> B_current: 0.208000. Sweeping to next field value
+//==> B_current: 0.206000. Running const_field_run_time
+//==> B_current: 0.206000. Sweeping to next field value
+//==> B_current: 0.204000. Running const_field_run_time
+//==> B_current: 0.204000. Sweeping to next field value
+//==> B_current: 0.202000. Running const_field_run_time
+//==> B_current: 0.202000. Sweeping to next field value
+//==> B_current: 0.200000. Running const_field_run_time
+//==> B_current: 0.200000. Sweeping to next field value
+//==> B_current: 0.198000. Running const_field_run_time
+//==> B_current: 0.198000. Sweeping to next field value
+//==> B_current: 0.196000. Running const_field_run_time
+//==> B_current: 0.196000. Sweeping to next field value
+//==> B_current: 0.194000. Running const_field_run_time
+//==> B_current: 0.194000. Sweeping to next field value
+//==> B_current: 0.192000. Running const_field_run_time
+//==> B_current: 0.192000. Sweeping to next field value
+//==> B_current: 0.190000. Running const_field_run_time
+//==> B_current: 0.190000. Sweeping to next field value
+//==> B_current: 0.188000. Running const_field_run_time
+//==> B_current: 0.188000. Sweeping to next field value
+//==> B_current: 0.186000. Running const_field_run_time
+//==> B_current: 0.186000. Sweeping to next field value
+//==> B_current: 0.184000. Running const_field_run_time
+//==> B_current: 0.184000. Sweeping to next field value
+//==> B_current: 0.182000. Running const_field_run_time
+//==> B_current: 0.182000. Sweeping to next field value
+//==> B_current: 0.180000. Running const_field_run_time
+//==> B_current: 0.180000. Sweeping to next field value
+//==> B_current: 0.178000. Running const_field_run_time
+//==> B_current: 0.178000. Sweeping to next field value
+//==> B_current: 0.176000. Running const_field_run_time
+//==> B_current: 0.176000. Sweeping to next field value
+//==> B_current: 0.174000. Running const_field_run_time
+//==> B_current: 0.174000. Sweeping to next field value
+//==> B_current: 0.172000. Running const_field_run_time
+//==> B_current: 0.172000. Sweeping to next field value
+//==> B_current: 0.170000. Running const_field_run_time
+//==> B_current: 0.170000. Sweeping to next field value
+//==> B_current: 0.168000. Running const_field_run_time
+//==> B_current: 0.168000. Sweeping to next field value
+//==> B_current: 0.166000. Running const_field_run_time
+//==> B_current: 0.166000. Sweeping to next field value
+//==> B_current: 0.164000. Running const_field_run_time
+//==> B_current: 0.164000. Sweeping to next field value
+//==> B_current: 0.162000. Running const_field_run_time
+//==> B_current: 0.162000. Sweeping to next field value
+//==> B_current: 0.160000. Running const_field_run_time
+//==> B_current: 0.160000. Sweeping to next field value
+//==> B_current: 0.158000. Running const_field_run_time
+//==> B_current: 0.158000. Sweeping to next field value
+//==> B_current: 0.156000. Running const_field_run_time
+//==> B_current: 0.156000. Sweeping to next field value
+//==> B_current: 0.154000. Running const_field_run_time
+//==> B_current: 0.154000. Sweeping to next field value
+//==> B_current: 0.152000. Running const_field_run_time
+//==> B_current: 0.152000. Sweeping to next field value
+//==> B_current: 0.150000. Running const_field_run_time
+//==> B_current: 0.150000. Sweeping to next field value
+//==> B_current: 0.148000. Running const_field_run_time
+//==> B_current: 0.148000. Sweeping to next field value
+//==> B_current: 0.146000. Running const_field_run_time
+//==> B_current: 0.146000. Sweeping to next field value
+//==> B_current: 0.144000. Running const_field_run_time
+//==> B_current: 0.144000. Sweeping to next field value
+//==> B_current: 0.142000. Running const_field_run_time
+//==> B_current: 0.142000. Sweeping to next field value
+//==> B_current: 0.140000. Running const_field_run_time
+//==> B_current: 0.140000. Sweeping to next field value
+//==> B_current: 0.138000. Running const_field_run_time
+//==> B_current: 0.138000. Sweeping to next field value
+//==> B_current: 0.136000. Running const_field_run_time
+//==> B_current: 0.136000. Sweeping to next field value
+//==> B_current: 0.134000. Running const_field_run_time
+//==> B_current: 0.134000. Sweeping to next field value
+//==> B_current: 0.132000. Running const_field_run_time
+//==> B_current: 0.132000. Sweeping to next field value
+//==> B_current: 0.130000. Running const_field_run_time
+//==> B_current: 0.130000. Sweeping to next field value
+//==> B_current: 0.128000. Running const_field_run_time
+//==> B_current: 0.128000. Sweeping to next field value
+//==> B_current: 0.126000. Running const_field_run_time
+//==> B_current: 0.126000. Sweeping to next field value
+//==> B_current: 0.124000. Running const_field_run_time
+//==> B_current: 0.124000. Sweeping to next field value
+//==> B_current: 0.122000. Running const_field_run_time
+//==> B_current: 0.122000. Sweeping to next field value
+//==> B_current: 0.120000. Running const_field_run_time
+//==> B_current: 0.120000. Sweeping to next field value
+//==> B_current: 0.118000. Running const_field_run_time
+//==> B_current: 0.118000. Sweeping to next field value
+//==> B_current: 0.116000. Running const_field_run_time
+//==> B_current: 0.116000. Sweeping to next field value
+//==> B_current: 0.114000. Running const_field_run_time
+//==> B_current: 0.114000. Sweeping to next field value
+//==> B_current: 0.112000. Running const_field_run_time
+//==> B_current: 0.112000. Sweeping to next field value
+//==> B_current: 0.110000. Running const_field_run_time
+//==> B_current: 0.110000. Sweeping to next field value
+//==> B_current: 0.108000. Running const_field_run_time
+//==> B_current: 0.108000. Sweeping to next field value
+//==> B_current: 0.106000. Running const_field_run_time
+//==> B_current: 0.106000. Sweeping to next field value
+//==> B_current: 0.104000. Running const_field_run_time
+//==> B_current: 0.104000. Sweeping to next field value
+//==> B_current: 0.102000. Running const_field_run_time
+//==> B_current: 0.102000. Sweeping to next field value
+//==> B_current: 0.100000. Running const_field_run_time
+//==> B_current: 0.100000. Sweeping to next field value
+//==> B_current: 0.098000. Running const_field_run_time
+//==> B_current: 0.098000. Sweeping to next field value
+//==> B_current: 0.096000. Running const_field_run_time
+//==> B_current: 0.096000. Sweeping to next field value
+//==> B_current: 0.094000. Running const_field_run_time
+//==> B_current: 0.094000. Sweeping to next field value
+//==> B_current: 0.092000. Running const_field_run_time
+//==> B_current: 0.092000. Sweeping to next field value
+//==> B_current: 0.090000. Running const_field_run_time
+//==> B_current: 0.090000. Sweeping to next field value
+//==> B_current: 0.088000. Running const_field_run_time
+//==> B_current: 0.088000. Sweeping to next field value
+//==> B_current: 0.086000. Running const_field_run_time
+//==> B_current: 0.086000. Sweeping to next field value
+//==> B_current: 0.084000. Running const_field_run_time
+//==> B_current: 0.084000. Sweeping to next field value
+//==> B_current: 0.082000. Running const_field_run_time
+//==> B_current: 0.082000. Sweeping to next field value
+//==> B_current: 0.080000. Running const_field_run_time
+//==> B_current: 0.080000. Sweeping to next field value
+//==> B_current: 0.078000. Running const_field_run_time
+//==> B_current: 0.078000. Sweeping to next field value
+//==> B_current: 0.076000. Running const_field_run_time
+//==> B_current: 0.076000. Sweeping to next field value
+//==> B_current: 0.074000. Running const_field_run_time
+//==> B_current: 0.074000. Sweeping to next field value
+//==> B_current: 0.072000. Running const_field_run_time
+//==> B_current: 0.072000. Sweeping to next field value
+//==> B_current: 0.070000. Running const_field_run_time
+//==> B_current: 0.070000. Sweeping to next field value
+//==> B_current: 0.068000. Running const_field_run_time
+//==> B_current: 0.068000. Sweeping to next field value
+//==> B_current: 0.066000. Running const_field_run_time
+//==> B_current: 0.066000. Sweeping to next field value
+//==> B_current: 0.064000. Running const_field_run_time
+//==> B_current: 0.064000. Sweeping to next field value
+//==> B_current: 0.062000. Running const_field_run_time
+//==> B_current: 0.062000. Sweeping to next field value
+//==> B_current: 0.060000. Running const_field_run_time
+//==> B_current: 0.060000. Sweeping to next field value
+//==> B_current: 0.058000. Running const_field_run_time
+//==> B_current: 0.058000. Sweeping to next field value
+//==> B_current: 0.056000. Running const_field_run_time
+//==> B_current: 0.056000. Sweeping to next field value
+//==> B_current: 0.054000. Running const_field_run_time
+//==> B_current: 0.054000. Sweeping to next field value
+//==> B_current: 0.052000. Running const_field_run_time
+//==> B_current: 0.052000. Sweeping to next field value
+//==> B_current: 0.050000. Running const_field_run_time
+//==> B_current: 0.050000. Sweeping to next field value
+//==> B_current: 0.048000. Running const_field_run_time
+//==> B_current: 0.048000. Sweeping to next field value
+//==> B_current: 0.046000. Running const_field_run_time
+//==> B_current: 0.046000. Sweeping to next field value
+//==> B_current: 0.044000. Running const_field_run_time
+//==> B_current: 0.044000. Sweeping to next field value
+//==> B_current: 0.042000. Running const_field_run_time
+//==> B_current: 0.042000. Sweeping to next field value
+//==> B_current: 0.040000. Running const_field_run_time
+//==> B_current: 0.040000. Sweeping to next field value
+//==> B_current: 0.038000. Running const_field_run_time
+//==> B_current: 0.038000. Sweeping to next field value
+//==> B_current: 0.036000. Running const_field_run_time
+//==> B_current: 0.036000. Sweeping to next field value
+//==> B_current: 0.034000. Running const_field_run_time
+//==> B_current: 0.034000. Sweeping to next field value
+//==> B_current: 0.032000. Running const_field_run_time
+//==> B_current: 0.032000. Sweeping to next field value
+//==> B_current: 0.030000. Running const_field_run_time
+//==> B_current: 0.030000. Sweeping to next field value
+//==> B_current: 0.028000. Running const_field_run_time
+//==> B_current: 0.028000. Sweeping to next field value
+//==> B_current: 0.026000. Running const_field_run_time
+//==> B_current: 0.026000. Sweeping to next field value
+//==> B_current: 0.024000. Running const_field_run_time
+//==> B_current: 0.024000. Sweeping to next field value
+//==> B_current: 0.022000. Running const_field_run_time
+//==> B_current: 0.022000. Sweeping to next field value
+//==> B_current: 0.020000. Running const_field_run_time
+//==> B_current: 0.020000. Sweeping to next field value
+//==> B_current: 0.018000. Running const_field_run_time
+//==> B_current: 0.018000. Sweeping to next field value
+//==> B_current: 0.016000. Running const_field_run_time
+//==> B_current: 0.016000. Sweeping to next field value
+//==> B_current: 0.014000. Running const_field_run_time
+//==> B_current: 0.014000. Sweeping to next field value
+//==> B_current: 0.012000. Running const_field_run_time
+//==> B_current: 0.012000. Sweeping to next field value
+//==> B_current: 0.010000. Running const_field_run_time
+//==> B_current: 0.010000. Sweeping to next field value
+//==> B_current: 0.008000. Running const_field_run_time
+//==> B_current: 0.008000. Sweeping to next field value
+//==> B_current: 0.006000. Running const_field_run_time
+//==> B_current: 0.006000. Sweeping to next field value
+//==> B_current: 0.004000. Running const_field_run_time
+//==> B_current: 0.004000. Sweeping to next field value
+//==> B_current: 0.002000. Running const_field_run_time
+//==> B_current: 0.002000. Sweeping to next field value
+//==> B_current: 0.000000. Running const_field_run_time
+//==> B_current: 0.000000. Sweeping to next field value
+//==> B_current: -0.002000. Running const_field_run_time
+//==> B_current: -0.002000. Sweeping to next field value
+//==> B_current: -0.004000. Running const_field_run_time
+//==> B_current: -0.004000. Sweeping to next field value
+//==> B_current: -0.006000. Running const_field_run_time
+//==> B_current: -0.006000. Sweeping to next field value
+//==> B_current: -0.008000. Running const_field_run_time
+//==> B_current: -0.008000. Sweeping to next field value
+//==> B_current: -0.010000. Running const_field_run_time
+//==> B_current: -0.010000. Sweeping to next field value
+//==> B_current: -0.012000. Running const_field_run_time
+//==> B_current: -0.012000. Sweeping to next field value
+//==> B_current: -0.014000. Running const_field_run_time
+//==> B_current: -0.014000. Sweeping to next field value
+//==> B_current: -0.016000. Running const_field_run_time
+//==> B_current: -0.016000. Sweeping to next field value
+//==> B_current: -0.018000. Running const_field_run_time
+//==> B_current: -0.018000. Sweeping to next field value
+//==> B_current: -0.020000. Running const_field_run_time
+//==> B_current: -0.020000. Sweeping to next field value
+//==> B_current: -0.022000. Running const_field_run_time
+//==> B_current: -0.022000. Sweeping to next field value
+//==> B_current: -0.024000. Running const_field_run_time
+//==> B_current: -0.024000. Sweeping to next field value
+//==> B_current: -0.026000. Running const_field_run_time
+//==> B_current: -0.026000. Sweeping to next field value
+//==> B_current: -0.028000. Running const_field_run_time
+//==> B_current: -0.028000. Sweeping to next field value
+//==> B_current: -0.030000. Running const_field_run_time
+//==> B_current: -0.030000. Sweeping to next field value
+//==> B_current: -0.032000. Running const_field_run_time
+//==> B_current: -0.032000. Sweeping to next field value
+//==> B_current: -0.034000. Running const_field_run_time
+//==> B_current: -0.034000. Sweeping to next field value
+//==> B_current: -0.036000. Running const_field_run_time
+//==> B_current: -0.036000. Sweeping to next field value
+//==> B_current: -0.038000. Running const_field_run_time
+//==> B_current: -0.038000. Sweeping to next field value
+//==> B_current: -0.040000. Running const_field_run_time
+//==> B_current: -0.040000. Sweeping to next field value
+//==> B_current: -0.042000. Running const_field_run_time
+//==> B_current: -0.042000. Sweeping to next field value
+//==> B_current: -0.044000. Running const_field_run_time
+//==> B_current: -0.044000. Sweeping to next field value
+//==> B_current: -0.046000. Running const_field_run_time
+//==> B_current: -0.046000. Sweeping to next field value
+//==> B_current: -0.048000. Running const_field_run_time
+//==> B_current: -0.048000. Sweeping to next field value
+//==> B_current: -0.050000. Running const_field_run_time
+//==> B_current: -0.050000. Sweeping to next field value
+//==> B_current: -0.052000. Running const_field_run_time
+//==> B_current: -0.052000. Sweeping to next field value
+//==> B_current: -0.054000. Running const_field_run_time
+//==> B_current: -0.054000. Sweeping to next field value
+//==> B_current: -0.056000. Running const_field_run_time
+//==> B_current: -0.056000. Sweeping to next field value
+//==> B_current: -0.058000. Running const_field_run_time
+//==> B_current: -0.058000. Sweeping to next field value
+//==> B_current: -0.060000. Running const_field_run_time
+//==> B_current: -0.060000. Sweeping to next field value
+//==> B_current: -0.062000. Running const_field_run_time
+//==> B_current: -0.062000. Sweeping to next field value
+//==> B_current: -0.064000. Running const_field_run_time
+//==> B_current: -0.064000. Sweeping to next field value
+//==> B_current: -0.066000. Running const_field_run_time
+//==> B_current: -0.066000. Sweeping to next field value
+//==> B_current: -0.068000. Running const_field_run_time
+//==> B_current: -0.068000. Sweeping to next field value
+//==> B_current: -0.070000. Running const_field_run_time
+//==> B_current: -0.070000. Sweeping to next field value
+//==> B_current: -0.072000. Running const_field_run_time
+//==> B_current: -0.072000. Sweeping to next field value
+//==> B_current: -0.074000. Running const_field_run_time
+//==> B_current: -0.074000. Sweeping to next field value
+//==> B_current: -0.076000. Running const_field_run_time
+//==> B_current: -0.076000. Sweeping to next field value
+//==> B_current: -0.078000. Running const_field_run_time
+//==> B_current: -0.078000. Sweeping to next field value
+//==> B_current: -0.080000. Running const_field_run_time
+//==> B_current: -0.080000. Sweeping to next field value
+//==> B_current: -0.082000. Running const_field_run_time
+//==> B_current: -0.082000. Sweeping to next field value
+//==> B_current: -0.084000. Running const_field_run_time
+//==> B_current: -0.084000. Sweeping to next field value
+//==> B_current: -0.086000. Running const_field_run_time
+//==> B_current: -0.086000. Sweeping to next field value
+//==> B_current: -0.088000. Running const_field_run_time
+//==> B_current: -0.088000. Sweeping to next field value
+//==> B_current: -0.090000. Running const_field_run_time
+//==> B_current: -0.090000. Sweeping to next field value
+//==> B_current: -0.092000. Running const_field_run_time
+//==> B_current: -0.092000. Sweeping to next field value
+//==> B_current: -0.094000. Running const_field_run_time
+//==> B_current: -0.094000. Sweeping to next field value
+//==> B_current: -0.096000. Running const_field_run_time
+//==> B_current: -0.096000. Sweeping to next field value
+//==> B_current: -0.098000. Running const_field_run_time
+//==> B_current: -0.098000. Sweeping to next field value
+//==> B_current: -0.100000. Running const_field_run_time
+//==> B_current: -0.100000. Sweeping to next field value
+//==> B_current: -0.102000. Running const_field_run_time
+//==> B_current: -0.102000. Sweeping to next field value
+//==> B_current: -0.104000. Running const_field_run_time
+//==> B_current: -0.104000. Sweeping to next field value
+//==> B_current: -0.106000. Running const_field_run_time
+//==> B_current: -0.106000. Sweeping to next field value
+//==> B_current: -0.108000. Running const_field_run_time
+//==> B_current: -0.108000. Sweeping to next field value
+//==> B_current: -0.110000. Running const_field_run_time
+//==> B_current: -0.110000. Sweeping to next field value
+//==> B_current: -0.112000. Running const_field_run_time
+//==> B_current: -0.112000. Sweeping to next field value
+//==> B_current: -0.114000. Running const_field_run_time
+//==> B_current: -0.114000. Sweeping to next field value
+//==> B_current: -0.116000. Running const_field_run_time
+//==> B_current: -0.116000. Sweeping to next field value
+//==> B_current: -0.118000. Running const_field_run_time
+//==> B_current: -0.118000. Sweeping to next field value
+//==> B_current: -0.120000. Running const_field_run_time
+//==> B_current: -0.120000. Sweeping to next field value
+//==> B_current: -0.122000. Running const_field_run_time
+//==> B_current: -0.122000. Sweeping to next field value
+//==> B_current: -0.124000. Running const_field_run_time
+//==> B_current: -0.124000. Sweeping to next field value
+//==> B_current: -0.126000. Running const_field_run_time
+//==> B_current: -0.126000. Sweeping to next field value
+//==> B_current: -0.128000. Running const_field_run_time
+//==> B_current: -0.128000. Sweeping to next field value
+//==> B_current: -0.130000. Running const_field_run_time
+//==> B_current: -0.130000. Sweeping to next field value
+//==> B_current: -0.132000. Running const_field_run_time
+//==> B_current: -0.132000. Sweeping to next field value
+//==> B_current: -0.134000. Running const_field_run_time
+//==> B_current: -0.134000. Sweeping to next field value
+//==> B_current: -0.136000. Running const_field_run_time
+//==> B_current: -0.136000. Sweeping to next field value
+//==> B_current: -0.138000. Running const_field_run_time
+//==> B_current: -0.138000. Sweeping to next field value
+//==> B_current: -0.140000. Running const_field_run_time
+//==> B_current: -0.140000. Sweeping to next field value
+//==> B_current: -0.142000. Running const_field_run_time
+//==> B_current: -0.142000. Sweeping to next field value
+//==> B_current: -0.144000. Running const_field_run_time
+//==> B_current: -0.144000. Sweeping to next field value
+//==> B_current: -0.146000. Running const_field_run_time
+//==> B_current: -0.146000. Sweeping to next field value
+//==> B_current: -0.148000. Running const_field_run_time
+//==> B_current: -0.148000. Sweeping to next field value
+//==> B_current: -0.150000. Running const_field_run_time
+//==> B_current: -0.150000. Sweeping to next field value
+//==> B_current: -0.152000. Running const_field_run_time
+//==> B_current: -0.152000. Sweeping to next field value
+//==> B_current: -0.154000. Running const_field_run_time
+//==> B_current: -0.154000. Sweeping to next field value
+//==> B_current: -0.156000. Running const_field_run_time
+//==> B_current: -0.156000. Sweeping to next field value
+//==> B_current: -0.158000. Running const_field_run_time
+//==> B_current: -0.158000. Sweeping to next field value
+//==> B_current: -0.160000. Running const_field_run_time
+//==> B_current: -0.160000. Sweeping to next field value
+//==> B_current: -0.162000. Running const_field_run_time
+//==> B_current: -0.162000. Sweeping to next field value
+//==> B_current: -0.164000. Running const_field_run_time
+//==> B_current: -0.164000. Sweeping to next field value
+//==> B_current: -0.166000. Running const_field_run_time
+//==> B_current: -0.166000. Sweeping to next field value
+//==> B_current: -0.168000. Running const_field_run_time
+//==> B_current: -0.168000. Sweeping to next field value
+//==> B_current: -0.170000. Running const_field_run_time
+//==> B_current: -0.170000. Sweeping to next field value
+//==> B_current: -0.172000. Running const_field_run_time
+//==> B_current: -0.172000. Sweeping to next field value
+//==> B_current: -0.174000. Running const_field_run_time
+//==> B_current: -0.174000. Sweeping to next field value
+//==> B_current: -0.176000. Running const_field_run_time
+//==> B_current: -0.176000. Sweeping to next field value
+//==> B_current: -0.178000. Running const_field_run_time
+//==> B_current: -0.178000. Sweeping to next field value
+//==> B_current: -0.180000. Running const_field_run_time
+//==> B_current: -0.180000. Sweeping to next field value
+//==> B_current: -0.182000. Running const_field_run_time
+//==> B_current: -0.182000. Sweeping to next field value
+//==> B_current: -0.184000. Running const_field_run_time
+//==> B_current: -0.184000. Sweeping to next field value
+//==> B_current: -0.186000. Running const_field_run_time
+//==> B_current: -0.186000. Sweeping to next field value
+//==> B_current: -0.188000. Running const_field_run_time
+//==> B_current: -0.188000. Sweeping to next field value
+//==> B_current: -0.190000. Running const_field_run_time
+//==> B_current: -0.190000. Sweeping to next field value
+//==> B_current: -0.192000. Running const_field_run_time
+//==> B_current: -0.192000. Sweeping to next field value
+//==> B_current: -0.194000. Running const_field_run_time
+//==> B_current: -0.194000. Sweeping to next field value
+//==> B_current: -0.196000. Running const_field_run_time
+//==> B_current: -0.196000. Sweeping to next field value
+//==> B_current: -0.198000. Running const_field_run_time
+//==> B_current: -0.198000. Sweeping to next field value
+//==> B_current: -0.200000. Running const_field_run_time
+//==> B_current: -0.200000. Sweeping to next field value
+//==> B_current: -0.202000. Running const_field_run_time
+//==> B_current: -0.202000. Sweeping to next field value
+//==> B_current: -0.204000. Running const_field_run_time
+//==> B_current: -0.204000. Sweeping to next field value
+//==> B_current: -0.206000. Running const_field_run_time
+//==> B_current: -0.206000. Sweeping to next field value
+//==> B_current: -0.208000. Running const_field_run_time
+//==> B_current: -0.208000. Sweeping to next field value
+//==> B_current: -0.210000. Running const_field_run_time
+//==> B_current: -0.210000. Sweeping to next field value
+//==> B_current: -0.212000. Running const_field_run_time
+//==> B_current: -0.212000. Sweeping to next field value
+//==> B_current: -0.214000. Running const_field_run_time
+//==> B_current: -0.214000. Sweeping to next field value
+//==> B_current: -0.216000. Running const_field_run_time
+//==> B_current: -0.216000. Sweeping to next field value
+//==> B_current: -0.218000. Running const_field_run_time
+//==> B_current: -0.218000. Sweeping to next field value
+//==> B_current: -0.220000. Running const_field_run_time
+//==> B_current: -0.220000. Sweeping to next field value
+//==> B_current: -0.222000. Running const_field_run_time
+//==> B_current: -0.222000. Sweeping to next field value
+//==> B_current: -0.224000. Running const_field_run_time
+//==> B_current: -0.224000. Sweeping to next field value
+//==> B_current: -0.226000. Running const_field_run_time
+//==> B_current: -0.226000. Sweeping to next field value
+//==> B_current: -0.228000. Running const_field_run_time
+//==> B_current: -0.228000. Sweeping to next field value
+//==> B_current: -0.230000. Running const_field_run_time
+//==> B_current: -0.230000. Sweeping to next field value
+//==> B_current: -0.232000. Running const_field_run_time
+//==> B_current: -0.232000. Sweeping to next field value
+//==> B_current: -0.234000. Running const_field_run_time
+//==> B_current: -0.234000. Sweeping to next field value
+//==> B_current: -0.236000. Running const_field_run_time
+//==> B_current: -0.236000. Sweeping to next field value
+//==> B_current: -0.238000. Running const_field_run_time
+//==> B_current: -0.238000. Sweeping to next field value
+//==> B_current: -0.240000. Running const_field_run_time
+//==> B_current: -0.240000. Sweeping to next field value
+//==> B_current: -0.242000. Running const_field_run_time
+//==> B_current: -0.242000. Sweeping to next field value
+//==> B_current: -0.244000. Running const_field_run_time
+//==> B_current: -0.244000. Sweeping to next field value
+//==> B_current: -0.246000. Running const_field_run_time
+//==> B_current: -0.246000. Sweeping to next field value
+//==> B_current: -0.248000. Running const_field_run_time
+//==> B_current: -0.248000. Sweeping to next field value
+//==> B_current: -0.250000. Running const_field_run_time
+//==> B_current: -0.250000. Sweeping to next field value
+//==> B_current: -0.252000. Running const_field_run_time
+//==> B_current: -0.252000. Sweeping to next field value
+//==> B_current: -0.254000. Running const_field_run_time
+//==> B_current: -0.254000. Sweeping to next field value
+//==> B_current: -0.256000. Running const_field_run_time
+//==> B_current: -0.256000. Sweeping to next field value
+//==> B_current: -0.258000. Running const_field_run_time
+//==> B_current: -0.258000. Sweeping to next field value
+//==> B_current: -0.260000. Running const_field_run_time
+//==> B_current: -0.260000. Sweeping to next field value
+//==> B_current: -0.262000. Running const_field_run_time
+//==> B_current: -0.262000. Sweeping to next field value
+//==> B_current: -0.264000. Running const_field_run_time
+//==> B_current: -0.264000. Sweeping to next field value
+//==> B_current: -0.266000. Running const_field_run_time
+//==> B_current: -0.266000. Sweeping to next field value
+//==> B_current: -0.268000. Running const_field_run_time
+//==> B_current: -0.268000. Sweeping to next field value
+//==> B_current: -0.270000. Running const_field_run_time
+//==> B_current: -0.270000. Sweeping to next field value
+//==> B_current: -0.272000. Running const_field_run_time
+//==> B_current: -0.272000. Sweeping to next field value
+//==> B_current: -0.274000. Running const_field_run_time
+//==> B_current: -0.274000. Sweeping to next field value
+//==> B_current: -0.276000. Running const_field_run_time
+//==> B_current: -0.276000. Sweeping to next field value
+//==> B_current: -0.278000. Running const_field_run_time
+//==> B_current: -0.278000. Sweeping to next field value
+//==> B_current: -0.280000. Running const_field_run_time
+//==> B_current: -0.280000. Sweeping to next field value
+//==> B_current: -0.282000. Running const_field_run_time
+//==> B_current: -0.282000. Sweeping to next field value
+//==> B_current: -0.284000. Running const_field_run_time
+//==> B_current: -0.284000. Sweeping to next field value
+//==> B_current: -0.286000. Running const_field_run_time
+//==> B_current: -0.286000. Sweeping to next field value
+//==> B_current: -0.288000. Running const_field_run_time
+//==> B_current: -0.288000. Sweeping to next field value
+//==> B_current: -0.290000. Running const_field_run_time
+//==> B_current: -0.290000. Sweeping to next field value
+//==> B_current: -0.292000. Running const_field_run_time
+//==> B_current: -0.292000. Sweeping to next field value
+//==> B_current: -0.294000. Running const_field_run_time
+//==> B_current: -0.294000. Sweeping to next field value
+//==> B_current: -0.296000. Running const_field_run_time
+//==> B_current: -0.296000. Sweeping to next field value
+//==> B_current: -0.298000. Running const_field_run_time
+//==> B_current: -0.298000. Sweeping to next field value
+//==> B_current: -0.300000. Running const_field_run_time
+//==> B_current: -0.300000. Sweeping to next field value
+//==> B_current: -0.302000. Running const_field_run_time
+//==> B_current: -0.302000. Sweeping to next field value
+//==> B_current: -0.304000. Running const_field_run_time
+//==> B_current: -0.304000. Sweeping to next field value
+//==> B_current: -0.306000. Running const_field_run_time
+//==> B_current: -0.306000. Sweeping to next field value
+//==> B_current: -0.308000. Running const_field_run_time
+//==> B_current: -0.308000. Sweeping to next field value
+//==> B_current: -0.310000. Running const_field_run_time
+//==> B_current: -0.310000. Sweeping to next field value
+//==> B_current: -0.312000. Running const_field_run_time
+//==> B_current: -0.312000. Sweeping to next field value
+//==> B_current: -0.314000. Running const_field_run_time
+//==> B_current: -0.314000. Sweeping to next field value
+//==> B_current: -0.316000. Running const_field_run_time
+//==> B_current: -0.316000. Sweeping to next field value
+//==> B_current: -0.318000. Running const_field_run_time
+//==> B_current: -0.318000. Sweeping to next field value
+//==> B_current: -0.320000. Running const_field_run_time
+//==> B_current: -0.320000. Sweeping to next field value
+//==> B_current: -0.322000. Running const_field_run_time
+//==> B_current: -0.322000. Sweeping to next field value
+//==> B_current: -0.324000. Running const_field_run_time
+//==> B_current: -0.324000. Sweeping to next field value
+//==> B_current: -0.326000. Running const_field_run_time
+//==> B_current: -0.326000. Sweeping to next field value
+//==> B_current: -0.328000. Running const_field_run_time
+//==> B_current: -0.328000. Sweeping to next field value
+//==> B_current: -0.330000. Running const_field_run_time
+//==> B_current: -0.330000. Sweeping to next field value
+//==> B_current: -0.332000. Running const_field_run_time
+//==> B_current: -0.332000. Sweeping to next field value
+//==> B_current: -0.334000. Running const_field_run_time
+//==> B_current: -0.334000. Sweeping to next field value
+//==> B_current: -0.336000. Running const_field_run_time
+//==> B_current: -0.336000. Sweeping to next field value
+//==> B_current: -0.338000. Running const_field_run_time
+//==> B_current: -0.338000. Sweeping to next field value
+//==> B_current: -0.340000. Running const_field_run_time
+//==> B_current: -0.340000. Sweeping to next field value
+//==> B_current: -0.342000. Running const_field_run_time
+//==> B_current: -0.342000. Sweeping to next field value
+//==> B_current: -0.344000. Running const_field_run_time
+//==> B_current: -0.344000. Sweeping to next field value
+//==> B_current: -0.346000. Running const_field_run_time
+//==> B_current: -0.346000. Sweeping to next field value
+//==> B_current: -0.348000. Running const_field_run_time
+//==> B_current: -0.348000. Sweeping to next field value
+//==> B_current: -0.350000. Running const_field_run_time
+//==> B_current: -0.350000. Sweeping to next field value
+//********************************************************************//
+//Please cite the following references, relevant for your simulation. //
+//See bibtex file in output folder for justification.                 //
+//********************************************************************//
+//   * Leliaert et al., AIP Adv. 7, 125010 (2017).
+//   * Vansteenkiste et al., AIP Adv. 4, 107133 (2014).
+//   * Mulkers et al., Phys. Rev. B 95, 144401 (2017).

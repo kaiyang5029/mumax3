@@ -1,0 +1,53 @@
+//mumax 3.10 [linux_amd64 go1.14(gc) CUDA-11.0]
+//GPU info: NVIDIA GeForce RTX 2080 Ti(11018MB), CUDA Driver 11.4, cc=7.5, using cc=75 PTX
+//(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium
+//This is free software without any warranty. See license.txt
+//********************************************************************//
+//  If you use mumax in any work or publication,                      //
+//  we kindly ask you to cite the references in references.bib        //
+//********************************************************************//
+//output directory: Example03.out/
+Aex = 12e-12
+Msat = 1e6
+Ku1 = 0.6e6
+AnisU = vector(0, 0, 1)
+Dbulk = 0
+Dind = 2e-3
+alpha = 0.10000
+SetGridsize(256, 256, 1)
+SetCellsize(4e-9, 4e-9, 1e-9)
+B_ext = vector(0, 0, 0)
+Temp = 0.0
+SetSolver(5)
+m = Uniform(0, 0, 1)
+sk_transl_pos := -400e-9
+sk_delta := 150e-9
+for i := 0; i < 5; i++ {
+	m.setInShape(cylinder(50e-9, inf).transl(sk_transl_pos+sk_delta*i, 0, 0), NeelSkyrmion(1, -1).scale(1, 1, 1).transl(sk_transl_pos+sk_delta*i, 0, 0))
+}
+B_ext = vector(0, 0, 0.1)
+Snapshot(m)
+RunWhile(MaxTorque > 5e-3)
+Snapshot(m)
+m = Uniform(0, 0, 1)
+for i := 0; i < 5; i++ {
+	m.setInShape(cylinder(50e-9, inf).transl(sk_transl_pos+sk_delta*i, 0, 0), NeelSkyrmion(1, -1).scale(1, 1, 1).transl(sk_transl_pos+sk_delta*i, 0, 0))
+}
+B_ext = vector(0, 0, 0.2)
+Snapshot(m)
+RunWhile(MaxTorque > 5e-3)
+Snapshot(m)
+m = Uniform(0, 0, 1)
+for i := 0; i < 5; i++ {
+	m.setInShape(cylinder(50e-9, inf).transl(sk_transl_pos+sk_delta*i, 0, 0), NeelSkyrmion(1, -1).scale(1, 1, 1).transl(sk_transl_pos+sk_delta*i, 0, 0))
+}
+B_ext = vector(0, 0, 0.3)
+Snapshot(m)
+RunWhile(MaxTorque > 5e-3)
+Snapshot(m)
+//********************************************************************//
+//Please cite the following references, relevant for your simulation. //
+//See bibtex file in output folder for justification.                 //
+//********************************************************************//
+//   * Mulkers et al., Phys. Rev. B 95, 144401 (2017).
+//   * Vansteenkiste et al., AIP Adv. 4, 107133 (2014).

@@ -1,0 +1,37 @@
+//mumax 3.10 [linux_amd64 go1.14(gc) CUDA-11.0]
+//GPU info: NVIDIA GeForce RTX 2080 Ti(11018MB), CUDA Driver 11.4, cc=7.5, using cc=75 PTX
+//(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium
+//This is free software without any warranty. See license.txt
+//********************************************************************//
+//  If you use mumax in any work or publication,                      //
+//  we kindly ask you to cite the references in references.bib        //
+//********************************************************************//
+//output directory: Example06a.out/
+Msat.SetRegion(0, 0)
+Aex.SetRegion(1, 12e-12)
+Msat.SetRegion(1, 1e6)
+Ku1.SetRegion(1, 1e6)
+AnisU.SetRegion(1, vector(0, 0, 1))
+Dbulk.SetRegion(1, 0)
+Dind.SetRegion(1, 0)
+alpha.SetRegion(1, 0.1)
+num_layers := 5
+SetGridsize(256, 256, num_layers)
+SetCellsize(4e-9, 4e-9, 2e-9)
+for layer_number := 0; layer_number < num_layers; layer_number += 1 {
+	defRegion(Mod(layer_number+1, 2), layer(layer_number))
+}
+B_ext = vector(0, 0, 0)
+Temp = 0.0
+SetSolver(5)
+m = RandomMagSeed(92238196)
+m.SetRegion(0, Uniform(0, 0, 0))
+RunWhile(MaxTorque > 1e-2)
+for layer_number := 0; layer_number < num_layers; layer_number += 1 {
+	Snapshot(CropLayer(m, layer_number))
+}
+//********************************************************************//
+//Please cite the following references, relevant for your simulation. //
+//See bibtex file in output folder for justification.                 //
+//********************************************************************//
+//   * Vansteenkiste et al., AIP Adv. 4, 107133 (2014).
