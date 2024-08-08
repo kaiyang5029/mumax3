@@ -8,7 +8,7 @@ Dind = 2e-3 //Interfacial DMI in J/m^2
 
 // Damping
 alpha = 0.05		 
-
+// maybe
 // Non-adiabaticity of spin-transfer-torque 
 xi = 0.2
 
