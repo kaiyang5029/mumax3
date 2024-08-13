@@ -36,7 +36,7 @@ m = Uniform(0, 0, 1)
 
 // B field range
 B_start := 0.25
-B_end := -0.35
+B_end := -0.25
 
 // sweep rate in Tesla/s
 // -1e6 => 1mT/ns => 5mT/5ns
