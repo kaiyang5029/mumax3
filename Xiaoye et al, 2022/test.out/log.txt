@@ -1,0 +1,190 @@
+//mumax 3.10 [windows_amd64 go1.11.6(gc) CUDA-11.0]
+//GPU info: NVIDIA GeForce RTX 2080 Ti(11263MB), CUDA Driver 12.2, cc=7.5, using cc=75 PTX
+//(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium
+//This is free software without any warranty. See license.txt
+//********************************************************************//
+//  If you use mumax in any work or publication,                      //
+//  we kindly ask you to cite the references in references.bib        //
+//********************************************************************//
+//output directory: test.out/
+mu_0 := 4 * pi * 1e-7
+Aex_val_1 := 17.3e-12
+Msat_val_1 := 1.18e6
+Keff_val_1 := 0.68e6
+Ku1_val_1 := Keff_val_1 + mu_0*Msat_val_1*Msat_val_1/2
+Dbulk_val_1 := 0
+Dind_val_1 := 0.0e-3
+alpha_val_1 := 0.05
+tFM_sk := 1e-9
+tHM_sk := 2e-9
+eff_med_scaling := tFM_sk / (tFM_sk + tHM_sk)
+Aex_val_1_scaled := Aex_val_1 * eff_med_scaling
+Msat_val_1_scaled := Msat_val_1 * eff_med_scaling
+Keff_val_1_scaled := Keff_val_1 * eff_med_scaling
+Ku1_val_1_scaled := Keff_val_1_scaled + mu_0*Msat_val_1_scaled*Msat_val_1_scaled/2
+Dbulk_val_1_scaled := Dbulk_val_1 * eff_med_scaling
+Dind_val_1_scaled := Dind_val_1 * eff_med_scaling
+alpha_val_1_scaled := alpha_val_1 * eff_med_scaling
+Aex.SetRegion(0, Aex_val_1_scaled)
+Msat.SetRegion(0, Msat_val_1_scaled)
+Ku1.SetRegion(0, Ku1_val_1_scaled)
+AnisU.SetRegion(0, vector(0, 0, 1))
+Dbulk.SetRegion(0, Dbulk_val_1_scaled)
+Dind.SetRegion(0, Dind_val_1_scaled)
+alpha.SetRegion(0, alpha_val_1_scaled)
+Aex.SetRegion(1, Aex_val_1_scaled)
+Msat.SetRegion(1, Msat_val_1_scaled)
+Ku1.SetRegion(1, Ku1_val_1_scaled)
+AnisU.SetRegion(1, vector(0, 0, 1))
+Dbulk.SetRegion(1, Dbulk_val_1_scaled)
+Dind.SetRegion(1, Dind_val_1_scaled)
+alpha.SetRegion(1, alpha_val_1_scaled)
+num_layers := 14
+SetPBC(2, 2, 0)
+SetGridsize(512, 512, num_layers)
+SetCellsize(4e-9, 4e-9, 3e-9)
+for layer_number := 0; layer_number < num_layers; layer_number += 1 {
+	defRegion(Mod(layer_number+1, 2), layer(layer_number))
+}
+mu0HRKKY_Sk := 0.1
+J_val_Sk := mu0HRKKY_Sk * tFM_sk * Msat_val_1
+scaleExchange_sk := J_val_Sk * 3e-9 / (2 * Aex_val_1_scaled)
+ext_scaleExchange(0, 1, scaleExchange_sk)
+B_ext = vector(0, 0, 0)
+Temp = 850
+SetSolver(5)
+m = RandomMagSeed(92238196)
+Run(1e-8)
+SnapshotAs(m, "layer1_850.jpg")
+Temp = 0
+Run(1e-8)
+SnapshotAs(m, "layer1_0.jpg")
+m = RandomMagSeed(92238196)
+Aex_val_1 = 17.8e-12
+Msat_val_1 = 0.88e6
+Keff_val_1 = 0.47e6
+Ku1_val_1 = Keff_val_1 + mu_0*Msat_val_1*Msat_val_1/2
+Dbulk_val_1 = 0
+Dind_val_1 = 1.3e-3
+alpha_val_1 = 0.05
+tFM_sk = 1e-9
+tHM_sk = 2e-9
+eff_med_scaling = tFM_sk / (tFM_sk + tHM_sk)
+Aex_val_1_scaled = Aex_val_1 * eff_med_scaling
+Msat_val_1_scaled = Msat_val_1 * eff_med_scaling
+Keff_val_1_scaled = Keff_val_1 * eff_med_scaling
+Ku1_val_1_scaled = Keff_val_1_scaled + mu_0*Msat_val_1_scaled*Msat_val_1_scaled/2
+Dbulk_val_1_scaled = Dbulk_val_1 * eff_med_scaling
+Dind_val_1_scaled = Dind_val_1 * eff_med_scaling
+alpha_val_1_scaled = alpha_val_1 * eff_med_scaling
+Aex.SetRegion(0, Aex_val_1_scaled)
+Msat.SetRegion(0, Msat_val_1_scaled)
+Ku1.SetRegion(0, Ku1_val_1_scaled)
+AnisU.SetRegion(0, vector(0, 0, 1))
+Dbulk.SetRegion(0, Dbulk_val_1_scaled)
+Dind.SetRegion(0, Dind_val_1_scaled)
+alpha.SetRegion(0, alpha_val_1_scaled)
+Aex.SetRegion(1, Aex_val_1_scaled)
+Msat.SetRegion(1, Msat_val_1_scaled)
+Ku1.SetRegion(1, Ku1_val_1_scaled)
+AnisU.SetRegion(1, vector(0, 0, 1))
+Dbulk.SetRegion(1, Dbulk_val_1_scaled)
+Dind.SetRegion(1, Dind_val_1_scaled)
+alpha.SetRegion(1, alpha_val_1_scaled)
+J_val_Sk = mu0HRKKY_Sk * tFM_sk * Msat_val_1
+scaleExchange_sk = J_val_Sk * 3e-9 / (2 * Aex_val_1_scaled)
+ext_scaleExchange(0, 1, scaleExchange_sk)
+SetSolver(5)
+Temp = 850
+Run(1e-8)
+SnapshotAs(m, "layer2_850.jpg")
+Temp = 0
+Run(1e-8)
+SnapshotAs(m, "layer2_0.jpg")
+m = RandomMagSeed(92238196)
+Aex_val_1 = 12.8e-12
+Msat_val_1 = 0.93e6
+Keff_val_1 = 0.22e6
+Ku1_val_1 = Keff_val_1 + mu_0*Msat_val_1*Msat_val_1/2
+Dbulk_val_1 = 0
+Dind_val_1 = 1.8e-3
+alpha_val_1 = 0.05
+tFM_sk = 1e-9
+tHM_sk = 2e-9
+eff_med_scaling = tFM_sk / (tFM_sk + tHM_sk)
+Aex_val_1_scaled = Aex_val_1 * eff_med_scaling
+Msat_val_1_scaled = Msat_val_1 * eff_med_scaling
+Keff_val_1_scaled = Keff_val_1 * eff_med_scaling
+Ku1_val_1_scaled = Keff_val_1_scaled + mu_0*Msat_val_1_scaled*Msat_val_1_scaled/2
+Dbulk_val_1_scaled = Dbulk_val_1 * eff_med_scaling
+Dind_val_1_scaled = Dind_val_1 * eff_med_scaling
+alpha_val_1_scaled = alpha_val_1 * eff_med_scaling
+Aex.SetRegion(0, Aex_val_1_scaled)
+Msat.SetRegion(0, Msat_val_1_scaled)
+Ku1.SetRegion(0, Ku1_val_1_scaled)
+AnisU.SetRegion(0, vector(0, 0, 1))
+Dbulk.SetRegion(0, Dbulk_val_1_scaled)
+Dind.SetRegion(0, Dind_val_1_scaled)
+alpha.SetRegion(0, alpha_val_1_scaled)
+Aex.SetRegion(1, Aex_val_1_scaled)
+Msat.SetRegion(1, Msat_val_1_scaled)
+Ku1.SetRegion(1, Ku1_val_1_scaled)
+AnisU.SetRegion(1, vector(0, 0, 1))
+Dbulk.SetRegion(1, Dbulk_val_1_scaled)
+Dind.SetRegion(1, Dind_val_1_scaled)
+alpha.SetRegion(1, alpha_val_1_scaled)
+J_val_Sk = mu0HRKKY_Sk * tFM_sk * Msat_val_1
+scaleExchange_sk = J_val_Sk * 3e-9 / (2 * Aex_val_1_scaled)
+ext_scaleExchange(0, 1, scaleExchange_sk)
+Temp = 850
+Run(1e-8)
+SnapshotAs(m, "layer3_850.jpg")
+Temp = 0
+Run(1e-8)
+SnapshotAs(m, "layer3_0.jpg")
+m = RandomMagSeed(92238196)
+Aex_val_1 = 13.6e-12
+Msat_val_1 = 0.96e6
+Keff_val_1 = 0.08e6
+Ku1_val_1 = Keff_val_1 + mu_0*Msat_val_1*Msat_val_1/2
+Dbulk_val_1 = 0
+Dind_val_1 = 2.0e-3
+alpha_val_1 = 0.05
+eff_med_scaling = tFM_sk / (tFM_sk + tHM_sk)
+Aex_val_1_scaled = Aex_val_1 * eff_med_scaling
+Msat_val_1_scaled = Msat_val_1 * eff_med_scaling
+Keff_val_1_scaled = Keff_val_1 * eff_med_scaling
+Ku1_val_1_scaled = Keff_val_1_scaled + mu_0*Msat_val_1_scaled*Msat_val_1_scaled/2
+Dbulk_val_1_scaled = Dbulk_val_1 * eff_med_scaling
+Dind_val_1_scaled = Dind_val_1 * eff_med_scaling
+alpha_val_1_scaled = alpha_val_1 * eff_med_scaling
+Aex.SetRegion(0, Aex_val_1_scaled)
+Msat.SetRegion(0, Msat_val_1_scaled)
+Ku1.SetRegion(0, Ku1_val_1_scaled)
+AnisU.SetRegion(0, vector(0, 0, 1))
+Dbulk.SetRegion(0, Dbulk_val_1_scaled)
+Dind.SetRegion(0, Dind_val_1_scaled)
+alpha.SetRegion(0, alpha_val_1_scaled)
+Aex.SetRegion(1, Aex_val_1_scaled)
+Msat.SetRegion(1, Msat_val_1_scaled)
+Ku1.SetRegion(1, Ku1_val_1_scaled)
+AnisU.SetRegion(1, vector(0, 0, 1))
+Dbulk.SetRegion(1, Dbulk_val_1_scaled)
+Dind.SetRegion(1, Dind_val_1_scaled)
+alpha.SetRegion(1, alpha_val_1_scaled)
+J_val_Sk = mu0HRKKY_Sk * tFM_sk * Msat_val_1
+scaleExchange_sk = J_val_Sk * 3e-9 / (2 * Aex_val_1_scaled)
+ext_scaleExchange(0, 1, scaleExchange_sk)
+Temp = 850
+Run(1e-8)
+SnapshotAs(m, "layer4_850.jpg")
+Temp = 0
+Run(1e-8)
+SnapshotAs(m, "layer4_0.jpg")
+//********************************************************************//
+//Please cite the following references, relevant for your simulation. //
+//See bibtex file in output folder for justification.                 //
+//********************************************************************//
+//   * Leliaert et al., AIP Adv. 7, 125010 (2017).
+//   * Vansteenkiste et al., AIP Adv. 4, 107133 (2014).
+//   * Mulkers et al., Phys. Rev. B 95, 144401 (2017).
