@@ -1,0 +1,139 @@
+// Big Goal: To understand the interaction between skyrmions and vortices
+// Local Goal: To simulate a multilayer stack of [Ir/Fe/Co/Pt]x14 which
+// hosts skyrmions using effective medium approximation
+
+// Effective medium approximation view the whole stack as an effective FM. 
+// All the parameters obtained as a whole stack but only happens at FM layer originally.
+// Our example has Fe/Co as FM layer, while Ir/Pt as HM layer. 
+
+// Parameters given from (Xiaoye et.al, 2022), trying to simulate
+
+// Define some constant
+mu_0:=4*pi*1e-7
+
+// Regions of material parameters
+Aex_val_1 := 13.6e-12
+Msat_val_1 := 0.96e6
+Keff_val_1 := 0.08e6
+Ku1_val_1 := Keff_val_1 + mu_0*Msat_val_1*Msat_val_1/2
+Dbulk_val_1 := 0
+Dind_val_1 := 2.0e-3
+alpha_val_1 := 0.05
+tFM_sk := 1e-9  //Fe&Co thickness
+tHM_sk := 2e-9  //both Ir and Pt thickness add tgt
+
+// Scale with efffective medium approximation
+eff_med_scaling := tFM_sk/(tFM_sk+tHM_sk)  // factor for effective medium approx for skyrmion layer
+Aex_val_1_scaled := Aex_val_1*eff_med_scaling
+Msat_val_1_scaled := Msat_val_1*eff_med_scaling
+Keff_val_1_scaled := Keff_val_1*eff_med_scaling
+Ku1_val_1_scaled := Keff_val_1_scaled + mu_0*Msat_val_1_scaled*Msat_val_1_scaled/2
+Dbulk_val_1_scaled := Dbulk_val_1*eff_med_scaling
+Dind_val_1_scaled := Dind_val_1*eff_med_scaling
+alpha_val_1_scaled := alpha_val_1*eff_med_scaling
+
+// Region 0 - Effective medium 1
+Aex.SetRegion(0, Aex_val_1_scaled) // Exchange in J/m
+Msat.SetRegion(0, Msat_val_1_scaled) //Saturation magnetisation in A/m
+Ku1.SetRegion(0, Ku1_val_1_scaled) // Anisotropy in J/m^3
+AnisU.SetRegion(0, vector(0, 0, 1)) //Uniaxial anisotropy direction 
+Dbulk.SetRegion(0, Dbulk_val_1_scaled)
+Dind.SetRegion(0, Dind_val_1_scaled) //Interfacial DMI in J/m^2
+alpha.SetRegion(0, alpha_val_1_scaled) // zDamping
+
+// Region 1 - Effective medium 2
+Aex.SetRegion(1, Aex_val_1_scaled) // Exchange in J/m^3
+Msat.SetRegion(1, Msat_val_1_scaled) //Saturation magnetisation in A/m
+Ku1.SetRegion(1, Ku1_val_1_scaled) // Anisotropy in J/m^3
+AnisU.SetRegion(1, vector(0, 0, 1)) //Uniaxial anisotropy direction 
+Dbulk.SetRegion(1, Dbulk_val_1_scaled)
+Dind.SetRegion(1, Dind_val_1_scaled) //Interfacial DMI in J/m^2
+alpha.SetRegion(1, alpha_val_1_scaled) // zDamping
+
+num_layers := 14
+
+// Simulation mesh
+SetPBC(2,2,0)
+SetGridsize(512, 512, num_layers)
+SetCellsize(4e-9, 4e-9, 3e-9)
+
+// Set regions to layers
+for layer_number:=0; layer_number<num_layers; layer_number+= 1 {
+	// layer0: region1, layer1: region0,...
+	defRegion(Mod(layer_number+1, 2), layer(layer_number))
+}
+
+// set interlayer exchange coupling
+//Sk (IEC-B)
+mu0HRKKY_Sk:= 0.1 // in T
+J_val_Sk := mu0HRKKY_Sk*tFM_sk*Msat_val_1  // 0.1 * 0.8e-9 * 1e6 = 8e-5
+scaleExchange_sk := J_val_Sk*3e-9/(2*Aex_val_1_scaled) // 8e-5 * 2.8e-9 /(12e-12) = 1.8 e-2
+
+// scale Exchange between sk-sk
+ext_scaleExchange(0, 1, scaleExchange_sk)   //between sk repeats
+
+TableAdd(B_ext)
+Temp = 850
+// choose solver
+SetSolver(5) 
+// ----------------------------
+m = Uniform(0,0,1)
+
+// B field range
+B_start := 0.25
+B_end := -0.25
+
+// take steps in field, say 2mT
+B_step_size := -0.01
+// field total num of steps
+B_total_steps := Ceil((B_end-B_start)/B_step_size)+1
+
+// define some variables here. Note these are all floats
+B_current := B_start
+t0 := 0.0
+
+// sim time per step in s
+sim_run_time_per_step := 5e-9
+
+// print values to check
+prt_str := sprintf("==> B_total_steps: %f",B_total_steps)
+print(prt_str)
+prt_str = sprintf("==> sim_run_time_per_step: %e", sim_run_time_per_step)
+print(prt_str)
+prt_str = sprintf("==> total_run_time: %e", sim_run_time_per_step*B_total_steps*2)
+print(prt_str)
+
+//Sweep Down
+for ind := 0; ind < B_total_steps; ind++ {
+	// initial stablisation run at constant field
+	B_current = B_start + B_step_size*ind
+	B_ext = vector(0,0,B_current)
+	
+	Run(sim_run_time_per_step)
+	TableSave()
+
+	// print values to check
+	prt_str = sprintf("==> B_current: %f. Sweeping to next field value",B_current)
+	print(prt_str)	
+}
+
+// B field range
+B_start = B_current
+B_end = 0.25
+
+// take steps in field, say 2mT
+B_step_size = 0.01
+// field total num of steps
+
+for ind := 0; ind < B_total_steps; ind++ {
+	// initial stablisation run at constant field
+	B_current = B_start + B_step_size*ind
+	B_ext = vector(0,0,B_current)
+	
+	Run(sim_run_time_per_step)
+	TableSave()
+
+	// print values to check
+	prt_str = sprintf("==> B_current: %f. Sweeping to next field value",B_current)
+	print(prt_str)	
+}
