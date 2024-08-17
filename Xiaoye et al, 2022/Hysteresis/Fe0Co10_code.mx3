@@ -25,8 +25,8 @@ tHM_sk := 2e-9  //both Ir and Pt thickness add tgt
 eff_med_scaling := tFM_sk/(tFM_sk+tHM_sk)  // factor for effective medium approx for skyrmion layer
 Aex_val_1_scaled := Aex_val_1*eff_med_scaling
 Msat_val_1_scaled := Msat_val_1*eff_med_scaling
-Keff_val_1_scaled := Keff_val_1*eff_med_scaling //
-Ku1_val_1_scaled := Keff_val_1_scaled + mu_0*Msat_val_1_scaled*Msat_val_1_scaled/2 // 
+Keff_val_1_scaled := Keff_val_1*eff_med_scaling
+Ku1_val_1_scaled := Keff_val_1_scaled + mu_0*Msat_val_1_scaled*Msat_val_1_scaled/2
 Dbulk_val_1_scaled := Dbulk_val_1*eff_med_scaling
 Dind_val_1_scaled := Dind_val_1*eff_med_scaling
 alpha_val_1_scaled := alpha_val_1*eff_med_scaling
@@ -53,7 +53,7 @@ num_layers := 14
 
 // Simulation mesh
 SetPBC(2,2,0)
-SetGridsize(512, 512, num_layers)
+SetGridsize(128, 128, num_layers)
 SetCellsize(4e-9, 4e-9, 3e-9)
 
 // Set regions to layers
@@ -65,11 +65,11 @@ for layer_number:=0; layer_number<num_layers; layer_number+= 1 {
 // set interlayer exchange coupling
 //Sk (IEC-B)
 mu0HRKKY_Sk:= 0.1 // in T
-J_val_Sk := mu0HRKKY_Sk*tFM_sk*Msat_val_1  // 0.1 * 0.8e-9 * 1e6 = 8e-5
+J_val_Sk := mu0HRKKY_Sk*tFM_sk*Msat_val_1_scaled  // 0.1 * 0.8e-9 * 1e6 = 8e-5
 scaleExchange_sk := J_val_Sk*3e-9/(2*Aex_val_1) // 8e-5 * 2.8e-9 /(12e-12) = 1.8 e-2
 
 // scale Exchange between sk-sk
-ext_scaleExchange(0, 1, scaleExchange_sk)   //between sk repeats
+ext_scaleExchange(0, 1, 0)   //between sk repeats
 
 TableAdd(B_ext)
 Temp = 850
@@ -79,90 +79,60 @@ SetSolver(5)
 m = Uniform(0,0,1)
 
 // B field range
-B_start := 0.25
-B_end := -0.25
+B_start := 0.20
+B_end := -0.20
 
-// sweep rate in Tesla/s
-// -1e6 => 1mT/ns => 5mT/5ns
-B_sweep_rate := -1e6
 // take steps in field, say 2mT
-B_step_size := -0.002
+B_step_size := -0.005
 // field total num of steps
 B_total_steps := Ceil((B_end-B_start)/B_step_size)+1
 
 // define some variables here. Note these are all floats
-B_current := 0.0
-B_current_mT := 0.0
+B_current := B_start
 t0 := 0.0
 
 // sim time per step in s
-sim_run_time_per_step := B_step_size / B_sweep_rate
-const_field_run_time := 1e-9
+sim_run_time_per_step := 1e-8
 
 // print values to check
 prt_str := sprintf("==> B_total_steps: %f",B_total_steps)
 print(prt_str)
 prt_str = sprintf("==> sim_run_time_per_step: %e", sim_run_time_per_step)
 print(prt_str)
+prt_str = sprintf("==> total_run_time: %e", sim_run_time_per_step*B_total_steps*2)
+print(prt_str)
 
-// Big loop
-for ind := 0; ind < B_total_steps; ind++ {	
-	
+//Sweep Down
+for ind := 0; ind < B_total_steps; ind++ {
 	// initial stablisation run at constant field
 	B_current = B_start + B_step_size*ind
 	B_ext = vector(0,0,B_current)
 	
-	// print values to check
-	prt_str = sprintf("==> B_current: %f. Running const_field_run_time",B_current)
-	print(prt_str)	
-	
-	Run(const_field_run_time)
-
+	Run(sim_run_time_per_step)
 	TableSave()
-	
-	// sweep to next field
-	t0 = t
-	B_ext = vector(0, 0, B_current + B_sweep_rate*(t-t0))
-	
+
 	// print values to check
 	prt_str = sprintf("==> B_current: %f. Sweeping to next field value",B_current)
 	print(prt_str)	
-	
-	Run(sim_run_time_per_step)
 }
 
 // B field range
 B_start = B_current
-B_end = 0.25
+B_end = 0.20
 
-// sweep rate in Tesla/s
-// -1e6 => 1mT/ns => 5mT/5ns
-B_sweep_rate = 1e6
 // take steps in field, say 2mT
-B_step_size = 0.002
+B_step_size = 0.005
+// field total num of steps
 
-// Big loop
-for ind := 0; ind < B_total_steps; ind++ {	
-	
+for ind := 0; ind < B_total_steps; ind++ {
 	// initial stablisation run at constant field
 	B_current = B_start + B_step_size*ind
 	B_ext = vector(0,0,B_current)
 	
-	// print values to check
-	prt_str = sprintf("==> B_current: %f. Running const_field_run_time",B_current)
-	print(prt_str)	
-	
-	Run(const_field_run_time)
-
+	Run(sim_run_time_per_step)
 	TableSave()
-	
-	// sweep to next field
-	t0 = t
-	B_ext = vector(0, 0, B_current + B_sweep_rate*(t-t0))
-	
+
 	// print values to check
 	prt_str = sprintf("==> B_current: %f. Sweeping to next field value",B_current)
 	print(prt_str)	
-	
-	Run(sim_run_time_per_step)
 }

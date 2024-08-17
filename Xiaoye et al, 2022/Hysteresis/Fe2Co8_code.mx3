@@ -9,14 +9,15 @@
 // Parameters given from (Xiaoye et.al, 2022), trying to simulate
 
 // Define some constant
-mu_0:=4*pi*1e-7
+mu_0 := 4*pi*1e-7
 
 // Regions of material parameters
-Aex_val_1 := 17.3e-12
-Msat_val_1 := 1.18e6
-Keff_val_1 := 0.68e6
+Aex_val_1 := 12.8e-12
+Msat_val_1 := 0.93e6
+Keff_val_1 := 0.22e6
+Ku1_val_1 := Keff_val_1 + mu_0*Msat_val_1*Msat_val_1/2
 Dbulk_val_1 := 0
-Dind_val_1 := 0.0e-3
+Dind_val_1 := 1.8e-3
 alpha_val_1 := 0.05
 tFM_sk := 1e-9  //Fe&Co thickness
 tHM_sk := 2e-9  //both Ir and Pt thickness add tgt
@@ -24,9 +25,9 @@ tHM_sk := 2e-9  //both Ir and Pt thickness add tgt
 // Scale with efffective medium approximation
 eff_med_scaling := tFM_sk/(tFM_sk+tHM_sk)  // factor for effective medium approx for skyrmion layer
 Aex_val_1_scaled := Aex_val_1*eff_med_scaling
-Msat_val_1_scaled := Msat_val_1*eff_med_scaling // 0.39e6
-Keff_val_1_scaled := Keff_val_1*eff_med_scaling // 0.23e6
-Ku1_val_1_scaled := Keff_val_1_scaled
+Msat_val_1_scaled := Msat_val_1*eff_med_scaling
+Keff_val_1_scaled := Keff_val_1*eff_med_scaling
+Ku1_val_1_scaled := Keff_val_1_scaled + mu_0*Msat_val_1_scaled*Msat_val_1_scaled/2
 Dbulk_val_1_scaled := Dbulk_val_1*eff_med_scaling
 Dind_val_1_scaled := Dind_val_1*eff_med_scaling
 alpha_val_1_scaled := alpha_val_1*eff_med_scaling
@@ -53,7 +54,7 @@ num_layers := 14
 
 // Simulation mesh
 SetPBC(2,2,0)
-SetGridsize(512, 512, num_layers)
+SetGridsize(128, 128, num_layers)
 SetCellsize(4e-9, 4e-9, 3e-9)
 
 // Set regions to layers
@@ -65,11 +66,11 @@ for layer_number:=0; layer_number<num_layers; layer_number+= 1 {
 // set interlayer exchange coupling
 //Sk (IEC-B)
 mu0HRKKY_Sk:= 0.1 // in T
-J_val_Sk := mu0HRKKY_Sk*tFM_sk*Msat_val_1_scaled  // 0.1 * 1e-9 * 1.18e6 = 1.18e-4
-scaleExchange_sk := J_val_Sk*3e-9/(2*Aex_val_1_scaled) // 8e-5 * 2.8e-9 /(17.3e-12) = 1.8 e-2
+J_val_Sk := mu0HRKKY_Sk*tFM_sk*Msat_val_1_scaled  // 0.1 * 0.8e-9 * 1e6 = 8e-5
+scaleExchange_sk := J_val_Sk*3e-9/(2*Aex_val_1) // 8e-5 * 2.8e-9 /(12e-12) = 1.8 e-2
 
 // scale Exchange between sk-sk
-ext_scaleExchange(0, 1, scaleExchange_sk)   //between sk repeats
+ext_scaleExchange(0, 1, 0)   //between sk repeats
 
 TableAdd(B_ext)
 Temp = 850
@@ -79,11 +80,11 @@ SetSolver(5)
 m = Uniform(0,0,1)
 
 // B field range
-B_start := 0.25
-B_end := -0.25
+B_start := 0.20
+B_end := -0.20
 
 // take steps in field, say 2mT
-B_step_size := -0.01
+B_step_size := -0.005
 // field total num of steps
 B_total_steps := Ceil((B_end-B_start)/B_step_size)+1
 
@@ -92,7 +93,7 @@ B_current := B_start
 t0 := 0.0
 
 // sim time per step in s
-sim_run_time_per_step := 5e-9
+sim_run_time_per_step := 1e-8
 
 // print values to check
 prt_str := sprintf("==> B_total_steps: %f",B_total_steps)
@@ -118,10 +119,10 @@ for ind := 0; ind < B_total_steps; ind++ {
 
 // B field range
 B_start = B_current
-B_end = 0.25
+B_end = 0.20
 
 // take steps in field, say 2mT
-B_step_size = 0.01
+B_step_size = 0.005
 // field total num of steps
 
 for ind := 0; ind < B_total_steps; ind++ {
